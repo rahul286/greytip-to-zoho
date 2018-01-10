@@ -215,6 +215,7 @@ var greytipToZoho = function (infile, outfile) {
 
     XLSX.writeFile(zoho_workbook, outfile )
 
+    return outfile
 }
 
 //export
