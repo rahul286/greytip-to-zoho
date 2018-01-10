@@ -22,8 +22,7 @@
     "build": {
         "appId": "com.rahul286.greytip-to-zoho",
         "dmg": {
-            "contents": [
-                {
+            "contents": [{
                     "x": 110,
                     "y": 150
                 },
@@ -32,8 +31,9 @@
                     "y": 150,
                     "type": "link",
                     "path": "/Applications"
-                }
-            ]
+                },
+            ],
+            "publish": "github"
         }
     },
     "dependencies": {

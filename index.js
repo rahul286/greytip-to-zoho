@@ -17,39 +17,130 @@ const path = require('path')
 //@src https://github.com/SheetJS/js-xlsx
 var XLSX = require('xlsx')
 
+/*
+    Prepare Zoho CSV
+*/
+
+// initialise an empty array
+var zoho_aoa = []
+
+// push csv header row
+zoho_aoa.push([
+    'Bill Date',
+    'Bill Number',
+    'Bill Status',
+    'Vendor Name',
+    'Account',
+    'Description',
+    'Rate'
+])
+
+// payslipsDate hold Date object created from first row of input excel
+var payslipsDate
+
+// var to hold zoho bill date
+var zoho_bill_date
+
+// var to hold zoho bill status
+var zoho_bill_status = 'Overdue'
+
+// Chart of Accounts and Description mapping
+var zoho_map = {
+    gross: {
+        account: 'Employee Salary Expense',
+        description: 'Gross Salary'
+    },
+    pf: {
+        account: 'Employees Provident Fund Payable',
+        description: 'Provident Fund'
+    },
+    tds: {
+        account: 'TDS Payable Employee Salary (192/92B)',
+        description: 'TDS (Income Tax)'
+    },
+    pt: {
+        account: 'Professional Tax Payable (MH)',
+        description: 'Professional Tax'
+    }
+}
+
+// console.log(zoho_map);
+
+// function to add a row to zoho CSV
+
+var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_pt) {
+    // pad emp_id to 4 digits
+    emp_id = emp_id.padStart(4, "0")
+
+    // cleanup numerical values
+    emp_gross = numeral(emp_gross).value()
+    emp_pf = numeral(emp_pf).value() * -1
+    emp_tds = numeral(emp_tds).value() * -1
+    emp_pt = numeral(emp_pt).value() * -1
+
+    // set zoho bill number for this row
+    zoho_bill_number = 'PR-' + moment(payslipsDate).format('YYYY-MMM-').toUpperCase() + emp_id
+
+    console.log(emp_id)
+    console.log(emp_name)
+    console.log(emp_gross)
+    console.log(emp_pf)
+    console.log(emp_tds)
+    console.log(emp_pt)
+    console.log(zoho_bill_date)
+    console.log(zoho_bill_number)
+    console.log(zoho_bill_status)
+
+    console.log("========\n")
+
+    // gross salary
+    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+        zoho_map.gross.account, zoho_map.gross.description, emp_gross
+    ])
+
+    // pf deduction
+    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+        zoho_map.pf.account, zoho_map.pf.description, emp_pf
+    ])
+
+    // tds deduction
+    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+        zoho_map.tds.account, zoho_map.tds.description, emp_tds
+    ])
+
+    // pt deduction
+    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+        zoho_map.pt.account, zoho_map.pt.description, emp_pt
+    ])
+
+} //end of add_zoho_row()
+
 var greytipToZoho = function (infile, outfile) {
     /*
         Error checking
     */
     console.log(infile);
-    console.log('default outfile' + outfile );
-
-    /*
-        Zoho CSV Defaults
-    */
+    console.log('default outfile' + outfile);
 
     /*
         Open input file
     */
-
     var wb = XLSX.readFile(infile)
     var ws = wb.Sheets.Sheet0
-
 
     /*
         Set payslips date
     */
-
     // pd = chrono.parseDate('Salary Statement For The Month Of Jul 2017')
-    var payslipsDate = chrono.parseDate(ws['A1'].v)
-
+    payslipsDate = chrono.parseDate(ws['A1'].v)
     //2017-07-31T06:30:00.000Z - make date last day of month
     payslipsDate.setMonth(payslipsDate.getMonth() + 1)
     payslipsDate.setDate(0)
+    // set zoho bill date as it will be same for entire run
+    zoho_bill_date = moment(payslipsDate).format('YYYY-MM-DD')
 
     // debug log
     console.log(payslipsDate)
-
 
     /*
         Set range to payroll data
@@ -59,134 +150,28 @@ var greytipToZoho = function (infile, outfile) {
         range: 2
     })
 
-    // debug log
-    // console.log("========\n")
     // console.log(wj)
-
-    /*
-        Prepare Zoho CSV
-    */
-
-    // initialise an empty array
-    var zoho_aoa = []
-
-    // push csv header row
-    zoho_aoa.push([
-        'Bill Date',
-        'Bill Number',
-        'Bill Status',
-        // 'GST Treatment',
-        'Vendor Name',
-        'Account',
-        'Description',
-        'Rate'
-    ])
 
     /*
         Process salary records
     */
 
     wj.forEach(function (item) {
-        //skip empty
-        if ('' == item['Employee No'].trim()) {
+        // extract data required by zoho
+        var emp_id = item[' Employee No '] ? item[' Employee No '] : item['Employee No']
+
+        // add an early check
+        if (! emp_id ){
             return
         }
-        // console.log(item)
-        // console.log(item['Employee No'])
-        // console.log(item[' Name '])
-        // console.log(item[' GROSS '])
-        // console.log(item[' PF '])
-        // console.log(item[' INCOME TAX '])
-        // console.log(item[' PROF TAX '])
-        // console.log("========\n")
 
-        //push GROSS salary
-        if (parseFloat(item[' GROSS '].trim()) > 0) {
-            zoho_aoa.push([
-                //'Bill Date'
-                moment(payslipsDate).format('YYYY-MM-DD'),
-                //'Bill Number'
-                'PR-' + moment(payslipsDate).format('YYYY-MM-') + item['Employee No'].trim().padStart(4, "0"),
-                //'Bill Status'
-                'Overdue',
-                //'GST Treatment'
-                // 'business_unregistered',
-                // 'Vendor Name'
-                item[' Name '].trim(),
-                // 'Account'
-                'Employee Salary Expense',
-                // 'Description'
-                'Gross Salary',
-                // 'Rate'
-                numeral(item[' GROSS ']).value()
-            ])
-        } //end GROSS salary
+        var emp_name = item[' Name '] ? item[' Name '] : item['Name']
+        var emp_gross = item[' GROSS '] ? item[' GROSS '] : item['GROSS']
+        var emp_pf = item[' PF '] ? item[' PF '] : item['PF']
+        var emp_tds = item[' INCOME TAX '] ? item[' INCOME TAX '] : item['INCOME TAX']
+        var emp_pt = item[' PROF TAX '] ? item[' PROF TAX '] : item['PROF TAX']
 
-        //push PF
-        if (parseFloat(item[' PF '].trim()) > 0) {
-            zoho_aoa.push([
-                //'Bill Date'
-                moment(payslipsDate).format('YYYY-MM-DD'),
-                //'Bill Number'
-                'PR-' + moment(payslipsDate).format('YYYY-MM-') + item['Employee No'].trim().padStart(4, "0"),
-                //'Bill Status'
-                'Overdue',
-                //'GST Treatment'
-                // 'business_unregistered',
-                // 'Vendor Name'
-                item[' Name '].trim(),
-                // 'Account'
-                'Employees Provident Fund Payable',
-                // 'Description'
-                'Provident Fund',
-                // 'Rate'
-                numeral('-' + item[' PF ']).value()
-            ])
-        } //end PF
-
-        //push INCOME TAX
-        if (parseFloat(item[' INCOME TAX '].trim()) > 0) {
-            zoho_aoa.push([
-                //'Bill Date'
-                moment(payslipsDate).format('YYYY-MM-DD'),
-                //'Bill Number'
-                'PR-' + moment(payslipsDate).format('YYYY-MM-') + item['Employee No'].trim().padStart(4, "0"),
-                //'Bill Status'
-                'Overdue',
-                //'GST Treatment'
-                // 'business_unregistered',
-                // 'Vendor Name'
-                item[' Name '].trim(),
-                // 'Account'
-                'TDS Payable Employee Salary (192/92B)',
-                // 'Description'
-                'TDS (Income Tax)',
-                // 'Rate'
-                numeral('-' + item[' INCOME TAX ']).value()
-            ])
-        } //end INCOME TAX
-
-        //push PROF TAX
-        if (parseFloat(item[' PROF TAX '].trim()) > 0) {
-            zoho_aoa.push([
-                //'Bill Date'
-                moment(payslipsDate).format('YYYY-MM-DD'),
-                //'Bill Number'
-                'PR-' + moment(payslipsDate).format('YYYY-MM-') + item['Employee No'].trim().padStart(4, "0"),
-                //'Bill Status'
-                'Overdue',
-                //'GST Treatment'
-                // 'business_unregistered',
-                // 'Vendor Name'
-                item[' Name '].trim(),
-                // 'Account'
-                'Professional Tax Payable (MH)',
-                // 'Description'
-                'Professional Tax',
-                // 'Rate'
-                numeral('-' + item[' PROF TAX ']).value()
-            ])
-        } //end PROF TAX
+        add_zoho_rows(emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_pt)
 
     }) //end of forEach
 
@@ -209,11 +194,11 @@ var greytipToZoho = function (infile, outfile) {
 
     //save newly created workbook on fs
     if (typeof outfile == 'undefined') {
-        outfile = path.dirname(infile) + '/' +'zoho-payroll-' + moment(payslipsDate).format('YYYY-MMM') + '.csv'
-        console.log('new outfile path' + outfile )
+        outfile = path.dirname(infile) + '/' + 'zoho-payroll-' + moment(payslipsDate).format('YYYY-MMM') + '.csv'
+        console.log('new outfile path' + outfile)
     }
 
-    XLSX.writeFile(zoho_workbook, outfile )
+    XLSX.writeFile(zoho_workbook, outfile)
 
     return outfile
 }
