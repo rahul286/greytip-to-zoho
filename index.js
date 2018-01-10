@@ -16,6 +16,11 @@ var XLSX = require('xlsx')
 
 var greytipToZoho = function (infile) {
     /*
+        Error checking
+    */
+    console.log(infile);
+
+    /*
         Zoho CSV Defaults
     */
 
