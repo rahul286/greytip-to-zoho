@@ -17,7 +17,8 @@
         "postinstall": "install-app-deps",
         "start": "electron .",
         "pack": "build --dir",
-        "dist": "build"
+        "dist": "build",
+        "release": "build"
     },
     "build": {
         "appId": "com.rahul286.greytip-to-zoho",
