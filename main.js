@@ -70,7 +70,7 @@ ipc.on('open-file-dialog', function (event) {
         buttonLabel: 'Select',
         filters: [{
                 name: 'Custom File Type',
-                extensions: ['xls']
+                extensions: ['xls', 'xlsx']
             }
 
         ],
