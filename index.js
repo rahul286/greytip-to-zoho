@@ -11,14 +11,18 @@ var moment = require('moment')
 //@src http://numeraljs.com/
 var numeral = require('numeral')
 
+//@src https://nodejs.org/api/path.html
+const path = require('path')
+
 //@src https://github.com/SheetJS/js-xlsx
 var XLSX = require('xlsx')
 
-var greytipToZoho = function (infile) {
+var greytipToZoho = function (infile, outfile) {
     /*
         Error checking
     */
     console.log(infile);
+    console.log('default outfile' + outfile );
 
     /*
         Zoho CSV Defaults
@@ -204,7 +208,13 @@ var greytipToZoho = function (infile) {
     XLSX.utils.book_append_sheet(zoho_workbook, zoho_sheet)
 
     //save newly created workbook on fs
-    XLSX.writeFile(zoho_workbook, 'zoho-payroll-' + moment(payslipsDate).format('YYYY-MMM') + '.csv')
+    if (typeof outfile == 'undefined') {
+        outfile = path.dirname(infile) + '/' +'zoho-payroll-' + moment(payslipsDate).format('YYYY-MMM') + '.csv'
+        console.log('new outfile path' + outfile )
+    }
+
+    XLSX.writeFile(zoho_workbook, outfile )
+
 }
 
 //export
