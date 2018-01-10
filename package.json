@@ -31,9 +31,8 @@
                     "y": 150,
                     "type": "link",
                     "path": "/Applications"
-                },
-            ],
-            "publish": "github"
+                }
+            ]
         }
     },
     "dependencies": {

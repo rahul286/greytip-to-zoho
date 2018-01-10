@@ -69,49 +69,61 @@ var zoho_map = {
 // function to add a row to zoho CSV
 
 var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_pt) {
-    // pad emp_id to 4 digits
-    emp_id = emp_id.padStart(4, "0")
+    // add an early check
+    if (!emp_id)
+        return
 
-    // cleanup numerical values
-    emp_gross = numeral(emp_gross).value()
-    emp_pf = numeral(emp_pf).value() * -1
-    emp_tds = numeral(emp_tds).value() * -1
-    emp_pt = numeral(emp_pt).value() * -1
+    // pad emp_id to 4 digits
+    emp_id = emp_id.trim().padStart(4, "0")
+    // emp name
+    emp_name = emp_name.trim()
+
+    // cleanup numerical valuess
+
+    if (numeral(emp_gross).value() > 0) {
+        zoho_map.gross.amount = numeral(emp_gross).value()
+    }
+    if (numeral(emp_pf).value() > 0) {
+        zoho_map.pf.amount = numeral(emp_pf).value() * -1
+    }
+    if (numeral(emp_tds).value() > 0) {
+        zoho_map.tds.amount = numeral(emp_tds).value() * -1
+    }
+    if (numeral(emp_pt).value() > 0) {
+        zoho_map.pt.amount = numeral(emp_pt).value() * -1
+    }
 
     // set zoho bill number for this row
     zoho_bill_number = 'PR-' + moment(payslipsDate).format('YYYY-MMM-').toUpperCase() + emp_id
 
     console.log(emp_id)
     console.log(emp_name)
-    console.log(emp_gross)
-    console.log(emp_pf)
-    console.log(emp_tds)
-    console.log(emp_pt)
+    //
+    // console.log(emp_gross)
+    // console.log(numeral(emp_gross).value())
+    // console.log(emp_pf)
+    // console.log(numeral(emp_pf).value())
+    // console.log(emp_tds)
+    // console.log(numeral(emp_tds).value())
+    // console.log(emp_pt)
+    // console.log(numeral(emp_pt).value())
+    //
     console.log(zoho_bill_date)
     console.log(zoho_bill_number)
-    console.log(zoho_bill_status)
-
+    // console.log(zoho_bill_status)
+    //
+    console.log(zoho_map);
     console.log("========\n")
 
-    // gross salary
-    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
-        zoho_map.gross.account, zoho_map.gross.description, emp_gross
-    ])
-
-    // pf deduction
-    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
-        zoho_map.pf.account, zoho_map.pf.description, emp_pf
-    ])
-
-    // tds deduction
-    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
-        zoho_map.tds.account, zoho_map.tds.description, emp_tds
-    ])
-
-    // pt deduction
-    zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
-        zoho_map.pt.account, zoho_map.pt.description, emp_pt
-    ])
+    Object.keys(zoho_map).forEach(function (key) {
+        if (zoho_map[key].amount) {
+            zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+                zoho_map[key].account,
+                zoho_map[key].description,
+                zoho_map[key].amount
+            ])
+        }
+    });
 
 } //end of add_zoho_row()
 
@@ -159,12 +171,6 @@ var greytipToZoho = function (infile, outfile) {
     wj.forEach(function (item) {
         // extract data required by zoho
         var emp_id = item[' Employee No '] ? item[' Employee No '] : item['Employee No']
-
-        // add an early check
-        if (! emp_id ){
-            return
-        }
-
         var emp_name = item[' Name '] ? item[' Name '] : item['Name']
         var emp_gross = item[' GROSS '] ? item[' GROSS '] : item['GROSS']
         var emp_pf = item[' PF '] ? item[' PF '] : item['PF']
