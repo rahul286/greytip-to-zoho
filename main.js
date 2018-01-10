@@ -72,7 +72,6 @@ ipc.on('open-file-dialog', function (event) {
                 name: 'Custom File Type',
                 extensions: ['xls', 'xlsx']
             }
-
         ],
         message: 'Select GreytipHR Payroll Excel File'
     }, function (files) {

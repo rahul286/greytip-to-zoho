@@ -14,11 +14,11 @@
         "url": "https://github.com/rahul286/greytip-to-zoho/issues"
     },
     "scripts": {
-        "postinstall": "install-app-deps",
+        "postinstall": "electron-builder install-app-deps",
         "start": "electron .",
-        "pack": "build --dir",
-        "dist": "build",
-        "release": "build"
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder",
+        "release": "electron-builder"
     },
     "build": {
         "appId": "com.rahul286.greytip-to-zoho",
@@ -26,8 +26,7 @@
             "publish": [
                 "github"
             ],
-            "contents": [
-                {
+            "contents": [{
                     "x": 110,
                     "y": 150
                 },
