@@ -18,16 +18,17 @@
         "start": "electron .",
         "pack": "electron-builder --dir",
         "dist": "electron-builder",
-        "release": "electron-builder"
+        "release": "echo $GH_TOKEN && electron-builder -m"
     },
     "build": {
         "appId": "com.rahul286.greytip-to-zoho",
         "dmg": {
-            "publish": [
-                "github"
-            ],
-            "contents": [
-                {
+            "publish": [{
+                "provider": "github",
+                "owner": "rahul286",
+                "repo": "greytip-to-zoho"
+            }],
+            "contents": [{
                     "x": 110,
                     "y": 150
                 },

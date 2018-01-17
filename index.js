@@ -29,6 +29,7 @@ zoho_aoa.push([
     'Bill Date',
     'Bill Number',
     'Bill Status',
+    'GST Treatment',
     'Vendor Name',
     'Account',
     'Description',
@@ -43,6 +44,9 @@ var zoho_bill_date
 
 // var to hold zoho bill status
 var zoho_bill_status = 'Overdue'
+
+// var to hold zoho bill status
+var zoho_gst_treatment = 'out_of_scope'
 
 // Chart of Accounts and Description mapping
 var zoho_map = {
@@ -117,7 +121,7 @@ var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_
 
     Object.keys(zoho_map).forEach(function (key) {
         if (zoho_map[key].amount) {
-            zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, emp_name,
+            zoho_aoa.push([zoho_bill_date, zoho_bill_number, zoho_bill_status, zoho_gst_treatment, emp_name,
                 zoho_map[key].account,
                 zoho_map[key].description,
                 zoho_map[key].amount
