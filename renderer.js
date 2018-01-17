@@ -8,7 +8,11 @@ const os = require('os')
 const shell = require('electron').shell
 const ipc = require('electron').ipcRenderer
 
+var appVersion = require('electron').remote.app.getVersion();
+
 const selectDirBtn = document.getElementById('select-file')
+
+document.getElementById('version').innerHTML = " v" + appVersion
 
 selectDirBtn.addEventListener('click', function (event) {
     ipc.send('open-file-dialog')
