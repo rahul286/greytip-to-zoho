@@ -1,6 +1,6 @@
 {
     "name": "greytip-to-zoho",
-    "version": "1.4.1",
+    "version": "1.5.0",
     "description": "GreytipHR payroll excel file to Zoho Books vendor bills CSV file converter",
     "main": "main.js",
     "author": "rahul286",
@@ -23,12 +23,15 @@
     "build": {
         "appId": "com.rahul286.greytip-to-zoho",
         "dmg": {
-            "publish": [{
-                "provider": "github",
-                "owner": "rahul286",
-                "repo": "greytip-to-zoho"
-            }],
-            "contents": [{
+            "publish": [
+                {
+                    "provider": "github",
+                    "owner": "rahul286",
+                    "repo": "greytip-to-zoho"
+                }
+            ],
+            "contents": [
+                {
                     "x": 110,
                     "y": 150
                 },
