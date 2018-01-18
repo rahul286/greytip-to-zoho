@@ -1,6 +1,6 @@
 {
     "name": "greytip-to-zoho",
-    "version": "1.5.1",
+    "version": "1.6.0",
     "description": "GreytipHR payroll excel file to Zoho Books vendor bills CSV file converter",
     "main": "main.js",
     "author": "rahul286",
