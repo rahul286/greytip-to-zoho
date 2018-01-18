@@ -73,6 +73,13 @@ var zoho_map = {
 // function to add a row to zoho CSV
 
 var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_pt) {
+
+    console.log(emp_id)
+    console.log(emp_name)
+    console.log(emp_gross)
+    console.log(emp_pf)
+    console.log(emp_tds)
+    console.log(emp_pt)
     // add an early check
     if (!emp_id)
         return
@@ -82,42 +89,18 @@ var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_
     // emp name
     emp_name = emp_name.trim()
 
-    // cleanup numerical valuess
-
-    if (numeral(emp_gross).value() > 0) {
-        zoho_map.gross.amount = numeral(emp_gross).value()
-    }
-    if (numeral(emp_pf).value() > 0) {
-        zoho_map.pf.amount = numeral(emp_pf).value() * -1
-    }
-    if (numeral(emp_tds).value() > 0) {
-        zoho_map.tds.amount = numeral(emp_tds).value() * -1
-    }
-    if (numeral(emp_pt).value() > 0) {
-        zoho_map.pt.amount = numeral(emp_pt).value() * -1
-    }
+    // cleanup numerical values
+    zoho_map.gross.amount = numeral(emp_gross).value()
+    zoho_map.pf.amount = numeral(emp_pf).value() * -1
+    zoho_map.tds.amount = numeral(emp_tds).value() * -1
+    zoho_map.pt.amount = numeral(emp_pt).value() * -1
 
     // set zoho bill number for this row
     zoho_bill_number = 'PR-' + moment(payslipsDate).format('YYYY-MMM-').toUpperCase() + emp_id
 
-    console.log(emp_id)
-    console.log(emp_name)
-    //
-    // console.log(emp_gross)
-    // console.log(numeral(emp_gross).value())
-    // console.log(emp_pf)
-    // console.log(numeral(emp_pf).value())
-    // console.log(emp_tds)
-    // console.log(numeral(emp_tds).value())
-    // console.log(emp_pt)
-    // console.log(numeral(emp_pt).value())
-    //
     console.log(zoho_bill_date)
     console.log(zoho_bill_number)
-    // console.log(zoho_bill_status)
-    //
-    console.log(zoho_map);
-    console.log("========\n")
+    // console.log(zoho_map);
 
     Object.keys(zoho_map).forEach(function (key) {
         if (zoho_map[key].amount) {
@@ -126,9 +109,11 @@ var add_zoho_rows = function (emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_
                 zoho_map[key].description,
                 zoho_map[key].amount
             ])
+            console.log(zoho_map[key].amount)
         }
     });
 
+    console.log("========\n")
 } //end of add_zoho_row()
 
 var greytipToZoho = function (infile, outfile) {
@@ -184,10 +169,6 @@ var greytipToZoho = function (infile, outfile) {
         add_zoho_rows(emp_id, emp_name, emp_gross, emp_pf, emp_tds, emp_pt)
 
     }) //end of forEach
-
-    // debug
-    // console.log(zoho_aoa)
-    // console.log("========\n")
 
     /*
         Save output
